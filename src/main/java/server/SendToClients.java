@@ -2,7 +2,7 @@ package server;
 
 import java.util.concurrent.BlockingQueue;
 
-public class SendToClients implements Runnable {
+class SendToClients implements Runnable {
     ChatServer chatServer;
     BlockingQueue<String> sendQueue;
 

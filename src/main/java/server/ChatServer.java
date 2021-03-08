@@ -6,23 +6,25 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatServer {
+    public String[] users = {"Granno", "Jensen", "Hansen", "Reder"};
+
     private ServerSocket serverSocket;
     private ConcurrentHashMap<String, ClientHandler> allClientHandlers = new ConcurrentHashMap<>();
     private BlockingQueue<String> sendQueue = new ArrayBlockingQueue<>(8);
-    private String currentlyOnline = "ONLINE#";
 
-    public ConcurrentHashMap<String, ClientHandler> getAllClientHandlers() {
-        return allClientHandlers;
-    }
+
+
 
     public void addToSendQueue(String msg)
     {
+
         try {
             sendQueue.put(msg);
         } catch (InterruptedException e) {
@@ -30,17 +32,46 @@ public class ChatServer {
         }
     }
 
-    public String online(){
 
-        allClientHandlers.values().forEach(clientHandler -> currentlyOnline += clientHandler.getMyID() +",");
+    public void sendToAll(String msg)
+    {
+        allClientHandlers.values().forEach((clientHandler -> {clientHandler.msgToAll(msg);}));
+
+    }
+
+
+
+    public ArrayList<String> connectedNames = new ArrayList<>(4);
+
+    public String sendOnline()
+    {
+        String currentlyOnline = "";
+        int listLength = connectedNames.size();
+        switch(listLength) {
+            case 1:
+                currentlyOnline = "ONLINE#" + connectedNames.get(0);
+                break;
+            case 2:
+                currentlyOnline = "ONLINE#" + connectedNames.get(0) + "," +connectedNames.get(1);
+                break;
+            case 3:
+                currentlyOnline = "ONLINE#" + connectedNames.get(0) + "," +connectedNames.get(1)+ "," +connectedNames.get(2);
+                break;
+            case 4:
+                currentlyOnline = "ONLINE#" + connectedNames.get(0) + "," +connectedNames.get(1) + "," + connectedNames.get(2) + "," + connectedNames.get(3);
+                break;
+        }
         return currentlyOnline;
     }
-
-    public void sendToAll(String msg){
-        allClientHandlers.values().forEach((clientHandler -> {clientHandler.msgToAll(msg);}));
-    }
-
-
+//    public String connected()
+//    {
+//        String online = "ONLINE#";
+//        for(String name : connectedNames)
+//        {
+//            online += name;
+//        }
+//        return online;
+//    }
 
 
 
@@ -48,12 +79,14 @@ public class ChatServer {
     private void startServer(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         System.out.println("Server started, listening on : "+port);
-        Scanner scName = new Scanner(System.in);
+
 
         while(true)
         {
+            System.out.println("Waiting for a client");
             Socket socket = serverSocket.accept(); //Blocking call
             System.out.println("New Client connected");
+
             ClientHandler clientHandler = new ClientHandler(socket, this);
             allClientHandlers.put(clientHandler.getMyID(), clientHandler);
             SendToClients stc = new SendToClients(this,sendQueue);

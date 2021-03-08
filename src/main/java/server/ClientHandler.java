@@ -6,74 +6,72 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ClientHandler implements Runnable {
+class ClientHandler implements Runnable {
     private Socket socket;
     private PrintWriter pw;
     ChatServer chatServer;
-
-    Scanner getName = new Scanner(System.in);
-
-    private String myID = "";
-
-    private ArrayList<String> connectedNames = new ArrayList<>();
+    static int index = 1;
+    private String myID = "name: ";
+//    Scanner scanner = new Scanner();
 
     public String getMyID() {
         return myID;
     }
-    public ClientHandler(Socket socket, ChatServer chatServer)
-    {
+
+    public ClientHandler(Socket socket, ChatServer chatServer) throws IOException {
         this.socket = socket;
         this.chatServer = chatServer;
+        this.myID += index;
+        index++;
 
     }
 
-
-//    public String sendOnline()
-//    {
-//        String currentlyOnline = "ONLINE#";
-//        for(ClientHandler name : chatServer.getAllClientHandlers())
-//        {
-//            currentlyOnline += name +",";
-//
-//
-//        }
-//        return currentlyOnline;
-//    }
 
     public void msgToAll(String msg) {
         pw.println(msg);
     }
 
-
-    private boolean handleCommand(String msg, PrintWriter pw, Scanner scanner)
-    {
+    private boolean authentication(String msg, PrintWriter pw, Scanner scanner) {
         String[] parts = msg.split("#");
-        if(parts.length == 1)
-        {
-            if(parts[0].equals("CLOSE")){
-                pw.println("CLOSE#");
+        if (parts.length == 1) {
+            pw.println("Security breach - closing connection");
+            return false;
+        } else if (parts.length == 2) {
+            String command = parts[0];
+            String user = parts[1];
+            if (user.equals("Granno") && !chatServer.connectedNames.contains("Granno") || user.equals("Reder") && !chatServer.connectedNames.contains("Reder") || user.equals("Hansen") && !chatServer.connectedNames.contains("Hansen") || user.equals("Jensen") && !chatServer.connectedNames.contains("Jensen")) {
+                myID = user;
+                chatServer.connectedNames.add(myID);
+                chatServer.addToSendQueue(chatServer.sendOnline());
+            }  else {
+                pw.println("Security breach - closing connection");
                 return false;
             }
 
-        } else if(parts.length == 2){
+        }
+        return true;
+    }
+
+    private boolean handleCommand(String msg, PrintWriter pw, Scanner scanner) {
+        String[] parts = msg.split("#");
+        if (parts.length == 1) {
+            if (parts[0].equals("CLOSE")) {
+                chatServer.addToSendQueue(getMyID() + " is now disconnected");
+                chatServer.connectedNames.remove(myID);
+                chatServer.addToSendQueue(chatServer.sendOnline());
+                return false;
+            }
+
+        } else if (parts.length == 2) {
             String token = parts[0];
             String argument = parts[1];
-            switch (token){
-                case "CONNECT" :
-                    myID = argument;
-                    connectedNames.add(myID);
-                    chatServer.addToSendQueue(chatServer.online());
-
+            switch (token) {
+                case "SEND":
+                    chatServer.addToSendQueue(argument);
                     break;
-                case "SEND" :
-
-                    break;
-
-
 
             }
-        } else if(parts.length == 3)
-        {
+        } else if (parts.length == 3) {
 
         }
         return true;
@@ -85,12 +83,17 @@ public class ClientHandler implements Runnable {
         Scanner scanner = new Scanner(socket.getInputStream());
         pw.println("Please connect before continuing - example: CONNECT#John");
 
+
         try {
             String message = "";
+            String authenticate = "";
             boolean keepRunning = true;
-            while(keepRunning) {
+            authenticate = scanner.nextLine();
+            keepRunning = authentication(authenticate, pw, scanner);
+            while (keepRunning) {
                 message = scanner.nextLine(); //Blocking call
                 keepRunning = handleCommand(message, pw, scanner);
+
             }
         } catch (Exception e) {
             System.out.println("");
