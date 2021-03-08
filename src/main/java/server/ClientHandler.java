@@ -10,8 +10,9 @@ public class ClientHandler implements Runnable {
     private PrintWriter pw;
     ChatServer chatServer;
 
-    static int index = 1;
-    private String myID = "name: ";
+    private String myID = "";
+
+
 
     public String getMyID() {
         return myID;
@@ -19,8 +20,6 @@ public class ClientHandler implements Runnable {
     public ClientHandler(Socket socket, ChatServer chatServer)
     {
         this.socket = socket;
-        this.myID += index;
-        index++;
         this.chatServer = chatServer;
     }
 
@@ -45,6 +44,7 @@ public class ClientHandler implements Runnable {
             String argument = parts[1];
             switch (token){
                 case "CONNECT" :
+                    myID = argument;
 
                     break;
                 case "SEND" :

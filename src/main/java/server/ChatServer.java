@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,18 +37,28 @@ public class ChatServer {
     private void startServer(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         System.out.println("Server started, listening on : "+port);
-
+        Scanner scName = new Scanner(System.in);
 
         while(true)
         {
             Socket socket = serverSocket.accept(); //Blocking call
             System.out.println("New Client connected");
+            ClientHandler clientHandler = new ClientHandler(socket, this);
+            allClientHandlers.put(clientHandler.getMyID(), clientHandler);
+            SendToClients stc = new SendToClients(this,sendQueue);
+
+            Thread t1 = new Thread(stc);
+            t1.start();
+
+            Thread t = new Thread(clientHandler);
+            t.start();
+
         }
     }
 
 
     //Call server with arguments like this: 8080
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) throws IOException {
         int port = 8088;
 
 
@@ -62,6 +73,7 @@ public class ChatServer {
             System.out.println("Illegal inputs provided when starting the server!");
             return;
         }
+        new ChatServer().startServer(port);
 
     }
 
