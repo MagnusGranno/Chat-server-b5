@@ -15,6 +15,11 @@ public class ChatServer {
     private ServerSocket serverSocket;
     private ConcurrentHashMap<String, ClientHandler> allClientHandlers = new ConcurrentHashMap<>();
     private BlockingQueue<String> sendQueue = new ArrayBlockingQueue<>(8);
+    private String currentlyOnline = "ONLINE#";
+
+    public ConcurrentHashMap<String, ClientHandler> getAllClientHandlers() {
+        return allClientHandlers;
+    }
 
     public void addToSendQueue(String msg)
     {
@@ -23,6 +28,12 @@ public class ChatServer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public String online(){
+
+        allClientHandlers.values().forEach(clientHandler -> currentlyOnline += clientHandler.getMyID() +",");
+        return currentlyOnline;
     }
 
     public void sendToAll(String msg){
@@ -59,7 +70,7 @@ public class ChatServer {
 
     //Call server with arguments like this: 8080
     public static void main(String[] args) throws IOException {
-        int port = 8088;
+        int port = 8080;
 
 
         try {
@@ -67,7 +78,8 @@ public class ChatServer {
                 port = Integer.parseInt(args[0]);
 
             } else {
-                throw new IllegalArgumentException("Server not provided with the right arguments");
+                port =8080;
+                //throw new IllegalArgumentException("Server not provided with the right arguments");
             }
         } catch (NumberFormatException ne) {
             System.out.println("Illegal inputs provided when starting the server!");

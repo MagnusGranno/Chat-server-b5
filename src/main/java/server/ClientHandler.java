@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ClientHandler implements Runnable {
@@ -10,9 +11,11 @@ public class ClientHandler implements Runnable {
     private PrintWriter pw;
     ChatServer chatServer;
 
+    Scanner getName = new Scanner(System.in);
+
     private String myID = "";
 
-
+    private ArrayList<String> connectedNames = new ArrayList<>();
 
     public String getMyID() {
         return myID;
@@ -21,11 +24,24 @@ public class ClientHandler implements Runnable {
     {
         this.socket = socket;
         this.chatServer = chatServer;
+
     }
 
 
+//    public String sendOnline()
+//    {
+//        String currentlyOnline = "ONLINE#";
+//        for(ClientHandler name : chatServer.getAllClientHandlers())
+//        {
+//            currentlyOnline += name +",";
+//
+//
+//        }
+//        return currentlyOnline;
+//    }
+
     public void msgToAll(String msg) {
-        pw.println("msg" +msg);
+        pw.println(msg);
     }
 
 
@@ -45,6 +61,8 @@ public class ClientHandler implements Runnable {
             switch (token){
                 case "CONNECT" :
                     myID = argument;
+                    connectedNames.add(myID);
+                    chatServer.addToSendQueue(chatServer.online());
 
                     break;
                 case "SEND" :
@@ -65,7 +83,7 @@ public class ClientHandler implements Runnable {
 
         pw = new PrintWriter(socket.getOutputStream(), true);
         Scanner scanner = new Scanner(socket.getInputStream());
-        pw.println("Du er connected");
+        pw.println("Please connect before continuing - example: CONNECT#John");
 
         try {
             String message = "";
