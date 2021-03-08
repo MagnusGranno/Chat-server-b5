@@ -34,7 +34,7 @@ class ClientHandler implements Runnable {
     private boolean authentication(String msg, PrintWriter pw, Scanner scanner) {
         String[] parts = msg.split("#");
         if (parts.length == 1) {
-            pw.println("Security breach - closing connection");
+            pw.println("Illegal input was received");
             return false;
         } else if (parts.length == 2) {
             String command = parts[0];
@@ -43,8 +43,9 @@ class ClientHandler implements Runnable {
                 myID = user;
                 chatServer.connectedNames.add(myID);
                 chatServer.addToSendQueue(chatServer.sendOnline());
+
             }  else {
-                pw.println("Security breach - closing connection");
+                pw.println("User not found");
                 return false;
             }
 
@@ -60,19 +61,42 @@ class ClientHandler implements Runnable {
                 chatServer.connectedNames.remove(myID);
                 chatServer.addToSendQueue(chatServer.sendOnline());
                 return false;
+            } else if(parts[0].equals("INFO"))
+            {
+                pw.println(chatServer.allClientHandlers.containsKey("Name: Granno"));
             }
 
         } else if (parts.length == 2) {
             String token = parts[0];
             String argument = parts[1];
             switch (token) {
-                case "SEND":
-                    chatServer.addToSendQueue(argument);
+
+                case "info":
+                    pw.println(chatServer.allClientHandlers.get(this));
                     break;
 
             }
         } else if (parts.length == 3) {
+            String token = parts[0];
+            String argument = parts[1];
+            String content = parts[2];
+            switch (token){
+                case "SEND":
+                    if(argument.equals("*"))
+                    {
+                        chatServer.addToSendQueue(argument);
 
+                    } else {
+
+                    }
+                    break;
+
+            }
+
+        } else
+        {
+            pw.println("Security breach - closing connection");
+            return false;
         }
         return true;
     }

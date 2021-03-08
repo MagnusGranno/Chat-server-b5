@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -15,8 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatServer {
     public String[] users = {"Granno", "Jensen", "Hansen", "Reder"};
 
+    public HashMap<String, Integer> ClientAddress = new HashMap<>();
+
+
+
     private ServerSocket serverSocket;
-    private ConcurrentHashMap<String, ClientHandler> allClientHandlers = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<String, ClientHandler> allClientHandlers = new ConcurrentHashMap<>();
     private BlockingQueue<String> sendQueue = new ArrayBlockingQueue<>(8);
 
 
@@ -25,12 +30,15 @@ public class ChatServer {
     public void addToSendQueue(String msg)
     {
 
+
         try {
             sendQueue.put(msg);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
+
+
 
 
     public void sendToAll(String msg)

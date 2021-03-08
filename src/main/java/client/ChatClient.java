@@ -26,7 +26,7 @@ public class ChatClient {
             String msgToSend = keyboard.nextLine();
             pw.println(msgToSend);
 
-            if(msgToSend.equals("CLOSE#")){
+            if(msgToSend.equals("CLOSE")){
                 keepRunning = false;
             }
         }
