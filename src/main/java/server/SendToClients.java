@@ -2,7 +2,8 @@ package server;
 
 import java.util.concurrent.BlockingQueue;
 
-class SendToClients implements Runnable {
+class SendToClients implements Runnable
+{
     ChatServer chatServer;
     BlockingQueue<String> sendQueue;
 
@@ -14,17 +15,18 @@ class SendToClients implements Runnable {
 
 
     @Override
-    public void run() {
-        while(true)
+    public void run()
+    {
+        while (true)
         {
-
-            try {
+            try
+            {
                 String message = sendQueue.take();
                 chatServer.sendToAll(message);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e)
+            {
                 e.printStackTrace();
             }
-
         }
     }
 }
