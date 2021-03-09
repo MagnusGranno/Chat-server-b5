@@ -145,7 +145,6 @@ class ClientHandler implements Runnable
             {
                 message = scanner.nextLine(); //Blocking call
                 keepRunning = handleCommand(message, pw);
-
             }
         }
         catch (NoSuchElementException n)

@@ -7,7 +7,6 @@ import java.util.Scanner;
 
 public class ChatClient
 {
-
     Socket socket;
     PrintWriter pw;
 
@@ -32,8 +31,6 @@ public class ChatClient
             }
         }
         socket.close();
-
-
     }
 
     public static void main(String[] args) throws IOException
@@ -55,6 +52,4 @@ public class ChatClient
         }
         new ChatClient().connect(ip, port);
     }
-
-
 }

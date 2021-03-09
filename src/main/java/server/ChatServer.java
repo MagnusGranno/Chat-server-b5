@@ -71,7 +71,6 @@ public class ChatServer
         serverSocket = new ServerSocket(port);
         System.out.println("Server started, listening on : " + port);
 
-
         while (true)
         {
             System.out.println("Waiting for a client");
@@ -83,12 +82,8 @@ public class ChatServer
             t.start();
 
             SendToClients stc = new SendToClients(this, sendQueue);
-
             Thread t1 = new Thread(stc);
             t1.start();
-
-
-
         }
     }
 
@@ -96,19 +91,16 @@ public class ChatServer
     //Call server with arguments like this: 8080
     public static void main(String[] args) throws IOException
     {
-
         int port = 8080;
         try
         {
             if (args.length == 1)
             {
                 port = Integer.parseInt(args[0]);
-
             }
             else
             {
                 port = 8080;
-
             }
         } catch (NumberFormatException ne)
         {
@@ -116,8 +108,5 @@ public class ChatServer
             return;
         }
         new ChatServer().startServer(port);
-
     }
-
-
 }
