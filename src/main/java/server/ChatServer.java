@@ -5,17 +5,21 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatServer
 {
-    public String[] users = {"Granno", "Jensen", "Hansen", "Reder"};
+    public String[] users1 = {"Granno", "Jensen", "Hansen", "Reder"};
     private ServerSocket serverSocket;
     public ConcurrentHashMap<String, ClientHandler> allClientHandlers = new ConcurrentHashMap<>();
     private BlockingQueue<String> sendQueue = new ArrayBlockingQueue<>(8);
-    public ArrayList<String> connectedNames = new ArrayList<>(4);
+    public Set<String> users = allClientHandlers.keySet();
+
 
     public void addToSendQueue(String msg)
     {
@@ -38,30 +42,45 @@ public class ChatServer
 
     }
 
-
-    //String for the ONLINE# message
-    public String sendOnline()
+    public void sendSpecific(ClientHandler sender, String receiver, String msg)
     {
-        String currentlyOnline = "";
-        int listLength = connectedNames.size();
-        switch (listLength)
+
+        String message = "MESSAGE#" +sender.getMyID()+ "#" +msg;
+        String[] receivers = receiver.split(",");
+        for(int i = 0; i<receivers.length; i++)
         {
-            case 1:
-                currentlyOnline = "ONLINE#" + connectedNames.get(0);
-                break;
-            case 2:
-                currentlyOnline = "ONLINE#" + connectedNames.get(0) + "," + connectedNames.get(1);
-                break;
-            case 3:
-                currentlyOnline = "ONLINE#" + connectedNames.get(0) + "," + connectedNames.get(1) + "," + connectedNames.get(2);
-                break;
-            case 4:
-                currentlyOnline = "ONLINE#" + connectedNames.get(0) + "," + connectedNames.get(1) + "," + connectedNames.get(2) + "," + connectedNames.get(3);
-                break;
+            allClientHandlers.get(receivers[i]).send(message);
+            System.out.println(receivers[i]);
         }
-        return currentlyOnline;
+//        for(String str: receivers)
+//        {
+//            message += sender.getMyID() + "#" +msg;
+//            allClientHandlers.get(str).send(message);
+//        }
     }
 
+    public void sendOnline()
+    {
+
+//       List<String> users = (List<String>) allClientHandlers.keySet();
+       //Users indeholder fx. kurt, ole og peter. Min opgave: lave en string der indeholder ONLINE#Kurt,Ole,Peter.
+        String online = "ONLINE#";
+        Iterator<String> it = users.iterator();
+        while(it.hasNext()){
+            online += it.next() + ",";
+        }
+        online = online.substring(0,online.length()-1);
+        for(ClientHandler ch : allClientHandlers.values()){
+            ch.send(online);
+        }
+    }
+
+
+
+    public void addToClientHandlers(String name, ClientHandler client)
+    {
+        allClientHandlers.put(name, client);
+    }
 
 
     private void startServer(int port) throws IOException
@@ -77,14 +96,15 @@ public class ChatServer
             System.out.println("New Client connected");
 
             ClientHandler clientHandler = new ClientHandler(socket, this);
-            allClientHandlers.put(clientHandler.getMyID(), clientHandler);
+            Thread t = new Thread(clientHandler);
+            t.start();
+
             SendToClients stc = new SendToClients(this, sendQueue);
 
             Thread t1 = new Thread(stc);
             t1.start();
 
-            Thread t = new Thread(clientHandler);
-            t.start();
+
 
         }
     }

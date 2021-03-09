@@ -39,18 +39,20 @@ class ClientHandler implements Runnable
         String[] parts = msg.split("#");
         if (parts.length == 1)
         {
+
             pw.println("CLOSE#1");
+
             return false;
         }
         else if (parts.length == 2)
         {
             String command = parts[0];
             String user = parts[1];
-            if (user.equals("Granno") && !chatServer.connectedNames.contains("Granno") || user.equals("Reder") && !chatServer.connectedNames.contains("Reder") || user.equals("Hansen") && !chatServer.connectedNames.contains("Hansen") || user.equals("Jensen") && !chatServer.connectedNames.contains("Jensen"))
+            if (user.equals("Granno") && !chatServer.allClientHandlers.containsKey("Granno") || user.equals("Reder") && !chatServer.allClientHandlers.containsKey("Reder") || user.equals("Hansen") && !chatServer.allClientHandlers.containsKey("Hansen") || user.equals("Jensen") && !chatServer.allClientHandlers.containsKey("Jensen"))
             {
                 myID = user;
-                chatServer.connectedNames.add(myID);
-                chatServer.addToSendQueue(chatServer.sendOnline());
+                chatServer.addToClientHandlers(myID,this);
+                chatServer.sendOnline();
             }
             else
             {
@@ -70,14 +72,17 @@ class ClientHandler implements Runnable
             if (parts[0].equals("CLOSE#"))
             {
                 pw.println("CLOSE#0");
-                chatServer.connectedNames.remove(myID);
-                chatServer.addToSendQueue(chatServer.sendOnline());
+
+                chatServer.sendOnline();
                 return false;
             }
             else
             {
+                chatServer.users.remove(myID);
+                chatServer.sendOnline();
                 pw.println("CLOSE#1");
                 return false;
+
             }
         }
         else if (parts.length == 3)
@@ -92,13 +97,15 @@ class ClientHandler implements Runnable
                     {
                         chatServer.addToSendQueue("MESSAGE#*#" + content);
                     }
-                    else
+                    else if(chatServer.allClientHandlers.containsKey(argument))
                     {
 
+                        chatServer.sendSpecific(this, argument,content);
                     }
                     break;
 
                 default:
+                    chatServer.allClientHandlers.remove(myID);
                     pw.println("CLOSE#1");
                     return false;
             }
@@ -133,6 +140,10 @@ class ClientHandler implements Runnable
             e.printStackTrace();
         }
         socket.close();
+    }
+    public void send(String msg)
+    {
+        pw.println(msg);
     }
 
 
