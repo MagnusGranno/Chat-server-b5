@@ -5,16 +5,17 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatServer
 {
-    public String[] users1 = {"Granno", "Jensen", "Hansen", "Reder"};
+    public ArrayList<String> users = new ArrayList<>(4);
+
+
+
     private ServerSocket serverSocket;
     public ConcurrentHashMap<String, ClientHandler> allClientHandlers = new ConcurrentHashMap<>();
     private BlockingQueue<String> sendQueue = new ArrayBlockingQueue<>(8);
@@ -35,6 +36,7 @@ public class ChatServer
 
     public void sendToAll(String msg)
     {
+
         allClientHandlers.values().forEach((clientHandler ->
         {
             clientHandler.msgToAll(msg);
@@ -68,6 +70,10 @@ public class ChatServer
 
     private void startServer(int port) throws IOException
     {
+        users.add("Granno");
+        users.add("Reder");
+        users.add("Hansen");
+        users.add("Jensen");
         serverSocket = new ServerSocket(port);
         System.out.println("Server started, listening on : " + port);
 
@@ -96,6 +102,7 @@ public class ChatServer
     //Call server with arguments like this: 8080
     public static void main(String[] args) throws IOException
     {
+
         int port = 8080;
         try
         {

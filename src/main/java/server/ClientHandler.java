@@ -34,7 +34,7 @@ class ClientHandler implements Runnable
         pw.println(msg);
     }
 
-    private boolean authentication(String msg, PrintWriter pw, Scanner scanner)
+    private boolean authentication(String msg, PrintWriter pw)
     {
         String[] parts = msg.split("#");
         if (parts.length == 1)
@@ -48,11 +48,14 @@ class ClientHandler implements Runnable
         {
             String command = parts[0];
             String user = parts[1];
-            if (user.equals("Granno") && !chatServer.allClientHandlers.containsKey("Granno") || user.equals("Reder") && !chatServer.allClientHandlers.containsKey("Reder") || user.equals("Hansen") && !chatServer.allClientHandlers.containsKey("Hansen") || user.equals("Jensen") && !chatServer.allClientHandlers.containsKey("Jensen"))
+            if(command.equals("CONNECT"))
             {
-                myID = user;
-                chatServer.addToClientHandlers(myID,this);
-                chatServer.sendOnline();
+                if (chatServer.users.contains(user) && !chatServer.allClientHandlers.containsKey(user))
+                {
+                    myID = user;
+                    chatServer.addToClientHandlers(myID, this);
+                    chatServer.sendOnline();
+                }
             }
             else
             {
@@ -64,7 +67,7 @@ class ClientHandler implements Runnable
         return true;
     }
 
-    private boolean handleCommand(String msg, PrintWriter pw, Scanner scanner)
+    private boolean handleCommand(String msg, PrintWriter pw)
     {
         String[] parts = msg.split("#");
         if (parts.length == 1)
@@ -144,11 +147,11 @@ class ClientHandler implements Runnable
             String authenticate = "";
             boolean keepRunning = true;
             authenticate = scanner.nextLine();
-            keepRunning = authentication(authenticate, pw, scanner);
+            keepRunning = authentication(authenticate, pw);
             while (keepRunning)
             {
                 message = scanner.nextLine(); //Blocking call
-                keepRunning = handleCommand(message, pw, scanner);
+                keepRunning = handleCommand(message, pw);
 
             }
         } catch (Exception e)
