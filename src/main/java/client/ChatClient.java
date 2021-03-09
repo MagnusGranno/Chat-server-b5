@@ -19,7 +19,6 @@ public class ChatClient
         Thread t = new Thread(sr);
         t.start();
 
-
         Scanner keyboard = new Scanner(System.in);
         boolean keepRunning = true;
         while (keepRunning)

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,14 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatServer
 {
     public ArrayList<String> users = new ArrayList<>(4);
-
-
-
     private ServerSocket serverSocket;
     public ConcurrentHashMap<String, ClientHandler> allClientHandlers = new ConcurrentHashMap<>();
     private BlockingQueue<String> sendQueue = new ArrayBlockingQueue<>(8);
-
-
 
     public void addToSendQueue(String msg)
     {

@@ -13,7 +13,6 @@ class SendToClients implements Runnable
         this.sendQueue = sendQueue;
     }
 
-
     @Override
     public void run()
     {

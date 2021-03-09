@@ -6,9 +6,7 @@ import java.util.Scanner;
 
 public class ServerReader implements Runnable
 {
-
     Scanner scanner;
-
     public ServerReader(InputStream is)
     {
         scanner = new Scanner(is);

@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 class ClientHandler implements Runnable
@@ -10,10 +11,7 @@ class ClientHandler implements Runnable
     private Socket socket;
     private PrintWriter pw;
     ChatServer chatServer;
-    static int index = 1;
-    private String myID = "name: ";
-
-
+    private String myID = "";
     public String getMyID()
     {
         return myID;
@@ -23,11 +21,7 @@ class ClientHandler implements Runnable
     {
         this.socket = socket;
         this.chatServer = chatServer;
-        this.myID += index;
-        index++;
-
     }
-
 
     public void msgToAll(String msg)
     {
@@ -39,16 +33,14 @@ class ClientHandler implements Runnable
         String[] parts = msg.split("#");
         if (parts.length == 1)
         {
-
             pw.println("CLOSE#1");
-
             return false;
         }
         else if (parts.length == 2)
         {
             String command = parts[0];
             String user = parts[1];
-            if(command.equals("CONNECT"))
+            if (command.equals("CONNECT"))
             {
                 if (chatServer.users.contains(user) && !chatServer.allClientHandlers.containsKey(user))
                 {
@@ -56,13 +48,17 @@ class ClientHandler implements Runnable
                     chatServer.addToClientHandlers(myID, this);
                     chatServer.sendOnline();
                 }
+                else
+                {
+                    pw.println("CLOSE#2");
+                    return false;
+                }
             }
             else
             {
                 pw.println("CLOSE#2");
                 return false;
             }
-
         }
         return true;
     }
@@ -81,7 +77,7 @@ class ClientHandler implements Runnable
             }
             else
             {
-               disconnect(myID);
+                disconnect(myID);
                 pw.println("CLOSE#1");
                 return false;
 
@@ -99,24 +95,21 @@ class ClientHandler implements Runnable
                     {
                         chatServer.addToSendQueue("MESSAGE#*#" + content);
                     }
-                    else if(!argument.contains(","))
+                    else if (!argument.contains(","))
                     {
 
-                        chatServer.sendSpecific(this, argument,content);
+                        chatServer.sendSpecific(this, argument, content);
                     }
-                    else if(argument.contains(","))
+                    else if (argument.contains(","))
                     {
                         String[] receivers = argument.split(",");
 
-                            for(String receiver: receivers){
-                                chatServer.sendSpecific(this,receiver,content);
-                            }
-
-
-
+                        for (String receiver : receivers)
+                        {
+                            chatServer.sendSpecific(this, receiver, content);
+                        }
                     }
                     break;
-
                 default:
                     disconnect(myID);
                     pw.println("CLOSE#1");
@@ -140,27 +133,35 @@ class ClientHandler implements Runnable
         Scanner scanner = new Scanner(socket.getInputStream());
         pw.println("Please connect before continuing - example: CONNECT#John");
 
-
         try
         {
-            String message = "";
-            String authenticate = "";
-            boolean keepRunning = true;
+            String message;
+            String authenticate;
+            boolean keepRunning;
+
             authenticate = scanner.nextLine();
             keepRunning = authentication(authenticate, pw);
-            while (keepRunning)
+            while (keepRunning && scanner.hasNext())
             {
                 message = scanner.nextLine(); //Blocking call
                 keepRunning = handleCommand(message, pw);
 
             }
-        } catch (Exception e)
+        }
+        catch (NoSuchElementException n)
+        {
+
+            n.printStackTrace();
+        }
+        catch (Exception e)
         {
             System.out.println("");
             e.printStackTrace();
         }
+        disconnect(myID);
         socket.close();
     }
+
     public void send(String msg)
     {
         pw.println(msg);
@@ -173,9 +174,15 @@ class ClientHandler implements Runnable
         try
         {
             handleClient();
-        } catch (IOException e)
+        }
+        catch (NoSuchElementException n)
+        {
+            n.printStackTrace();
+        }
+        catch (IOException e)
         {
             e.printStackTrace();
         }
+
     }
 }
