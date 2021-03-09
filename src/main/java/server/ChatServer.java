@@ -18,7 +18,7 @@ public class ChatServer
     private ServerSocket serverSocket;
     public ConcurrentHashMap<String, ClientHandler> allClientHandlers = new ConcurrentHashMap<>();
     private BlockingQueue<String> sendQueue = new ArrayBlockingQueue<>(8);
-    public Set<String> users = allClientHandlers.keySet();
+
 
 
     public void addToSendQueue(String msg)
@@ -44,35 +44,18 @@ public class ChatServer
 
     public void sendSpecific(ClientHandler sender, String receiver, String msg)
     {
-
         String message = "MESSAGE#" +sender.getMyID()+ "#" +msg;
-        String[] receivers = receiver.split(",");
-        for(int i = 0; i<receivers.length; i++)
-        {
-            allClientHandlers.get(receivers[i]).send(message);
-            System.out.println(receivers[i]);
-        }
-//        for(String str: receivers)
-//        {
-//            message += sender.getMyID() + "#" +msg;
-//            allClientHandlers.get(str).send(message);
-//        }
+        allClientHandlers.get(receiver).send(message);
     }
 
     public void sendOnline()
     {
-
-//       List<String> users = (List<String>) allClientHandlers.keySet();
-       //Users indeholder fx. kurt, ole og peter. Min opgave: lave en string der indeholder ONLINE#Kurt,Ole,Peter.
         String online = "ONLINE#";
-        Iterator<String> it = users.iterator();
-        while(it.hasNext()){
-            online += it.next() + ",";
+        for(ClientHandler ch : allClientHandlers.values()){
+            online += ch.getMyID() + ",";
         }
         online = online.substring(0,online.length()-1);
-        for(ClientHandler ch : allClientHandlers.values()){
-            ch.send(online);
-        }
+        addToSendQueue(online);
     }
 
 

@@ -72,14 +72,13 @@ class ClientHandler implements Runnable
             if (parts[0].equals("CLOSE#"))
             {
                 pw.println("CLOSE#0");
+                disconnect(myID);
 
-                chatServer.sendOnline();
                 return false;
             }
             else
             {
-                chatServer.users.remove(myID);
-                chatServer.sendOnline();
+               disconnect(myID);
                 pw.println("CLOSE#1");
                 return false;
 
@@ -97,20 +96,38 @@ class ClientHandler implements Runnable
                     {
                         chatServer.addToSendQueue("MESSAGE#*#" + content);
                     }
-                    else if(chatServer.allClientHandlers.containsKey(argument))
+                    else if(!argument.contains(","))
                     {
 
                         chatServer.sendSpecific(this, argument,content);
                     }
+                    else if(argument.contains(","))
+                    {
+                        String[] receivers = argument.split(",");
+
+                            for(String receiver: receivers){
+                                chatServer.sendSpecific(this,receiver,content);
+                            }
+
+
+
+                    }
                     break;
 
                 default:
-                    chatServer.allClientHandlers.remove(myID);
+                    disconnect(myID);
                     pw.println("CLOSE#1");
                     return false;
             }
         }
         return true;
+    }
+
+    public void disconnect(String clientHandler)
+    {
+
+        chatServer.allClientHandlers.remove(clientHandler);
+        chatServer.sendOnline();
     }
 
     private void handleClient() throws IOException
