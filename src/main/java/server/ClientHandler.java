@@ -123,7 +123,7 @@ class ClientHandler implements Runnable
 
         pw = new PrintWriter(socket.getOutputStream(), true);
         Scanner scanner = new Scanner(socket.getInputStream());
-        pw.println("Please connect before continuing - example: CONNECT#John");
+
 
         try
         {
