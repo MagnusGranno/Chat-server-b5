@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 class ClientHandler implements Runnable
 {
+    private boolean keepRunning = false;
     private Socket socket;
     private PrintWriter pw;
     ChatServer chatServer;
@@ -28,6 +29,28 @@ class ClientHandler implements Runnable
         pw.println(msg);
     }
 
+    private boolean connectUser(String msg, PrintWriter pw)
+    {
+        String[] cParts = msg.split("#");
+        String command = cParts[0];
+        String user = cParts[1];
+        if(command.equals("CONNECT"))
+        {
+            if (chatServer.users.contains(user) && !chatServer.allClientHandlers.containsKey(user))
+            {
+                myID = user;
+                chatServer.addToClientHandlers(myID, this);
+                chatServer.sendOnline();
+            }
+            else
+            {
+                pw.println("CLOSE#1");
+                return false;
+            }
+        }
+        return true;
+    }
+
     private boolean handleCommand(String msg, PrintWriter pw)
     {
         String[] parts = msg.split("#");
@@ -46,22 +69,8 @@ class ClientHandler implements Runnable
         }
         else if (parts.length == 2)
         {
-            String command = parts[0];
-            String user = parts[1];
-            if (command.equals("CONNECT"))
-            {
-                if (chatServer.users.contains(user) && !chatServer.allClientHandlers.containsKey(user))
-                {
-                    myID = user;
-                    chatServer.addToClientHandlers(myID, this);
-                    chatServer.sendOnline();
-                }
-                else
-                {
-                    pw.println("CLOSE#2");
-                    return false;
-                }
-            }
+            pw.println("CLOSE#1");
+            return false;
         }
         else if (parts.length == 3)
         {
@@ -75,10 +84,13 @@ class ClientHandler implements Runnable
                     {
                         chatServer.addToSendQueue("MESSAGE#*#" + content);
                     }
-                    else if (!argument.contains(","))
+                    else if (chatServer.users.contains(argument))
                     {
-
                         chatServer.sendSpecific(this, argument, content);
+                    }
+                    else if(!chatServer.users.contains(argument))
+                    {
+                        pw.println(argument + " doesn't exist or is not online");
                     }
                     else if (argument.contains(","))
                     {
@@ -115,8 +127,8 @@ class ClientHandler implements Runnable
 
         try
         {
-            String message;
-            boolean keepRunning = true;
+            String message = scanner.nextLine();
+            keepRunning = connectUser(message, pw);
             while (keepRunning && scanner.hasNext())
             {
                 message = scanner.nextLine(); //Blocking call

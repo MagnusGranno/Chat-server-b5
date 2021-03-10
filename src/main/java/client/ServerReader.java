@@ -1,5 +1,7 @@
 package client;
 
+import server.ChatServer;
+
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -8,9 +10,11 @@ public class ServerReader implements Runnable
     Scanner scanner;
     Boolean bSr = true;
     String message = "";
-    public ServerReader(InputStream is)
+    ChatClient chatClient;
+    public ServerReader(InputStream is, ChatClient chatClient)
     {
         scanner = new Scanner(is);
+        this.chatClient = chatClient;
     }
 
     @Override
@@ -19,14 +23,20 @@ public class ServerReader implements Runnable
 
             while (bSr && scanner.hasNext())
             {
-
                 message = scanner.nextLine();
+
                 if (message.equals("CLOSE#0") || message.equals("CLOSE#1") || message.equals("CLOSE#2"))
                 {
-                    System.out.println(message);
                     bSr = false;
+                    chatClient.setKeepRunning(false);
+                    System.out.println(message);
+                    System.out.println("Please hit return to stop client");
+
                 }
-                System.out.println(message);
+                else
+                {
+                    System.out.println(message);
+                }
             }
     }
 }

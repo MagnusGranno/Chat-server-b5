@@ -9,36 +9,26 @@ public class ChatClient
 {
     Socket socket;
     PrintWriter pw;
+    private boolean keepRunning;
+
+    public void setKeepRunning(boolean keepRunning)
+    {
+        this.keepRunning = keepRunning;
+    }
 
     public void connect(String address, int port) throws IOException
     {
         socket = new Socket(address, port);
         pw = new PrintWriter(socket.getOutputStream(), true);
-        ServerReader sr = new ServerReader(socket.getInputStream());
+        ServerReader sr = new ServerReader(socket.getInputStream(),this);
         Thread t = new Thread(sr);
         t.start();
-
-
-
-
-
-
         Scanner keyboard = new Scanner(System.in);
-        boolean keepRunning = true;
+        keepRunning = true;
         while (keepRunning)
         {
             String msgToSend = keyboard.nextLine();
-            if (msgToSend.equals("CLOSE#") || sr.bSr == false)
-            {
-                System.out.println("CLOSE#0");
-                keepRunning = false;
-            } else
-            {
-                pw.println(msgToSend);
-            }
-
-
-
+            pw.println(msgToSend);
 
         }
 
