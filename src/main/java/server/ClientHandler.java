@@ -28,12 +28,20 @@ class ClientHandler implements Runnable
         pw.println(msg);
     }
 
-    private boolean authentication(String msg, PrintWriter pw)
+    private boolean handleCommand(String msg, PrintWriter pw)
     {
         String[] parts = msg.split("#");
         if (parts.length == 1)
         {
-            pw.println("CLOSE#1");
+            if (parts[0].equals("CLOSE#"))
+            {
+                pw.println("CLOSE#0");
+                disconnect(myID);
+            }
+            else
+            {
+                pw.println("CLOSE#2");
+            }
             return false;
         }
         else if (parts.length == 2)
@@ -53,34 +61,6 @@ class ClientHandler implements Runnable
                     pw.println("CLOSE#2");
                     return false;
                 }
-            }
-            else
-            {
-                pw.println("CLOSE#2");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean handleCommand(String msg, PrintWriter pw)
-    {
-        String[] parts = msg.split("#");
-        if (parts.length == 1)
-        {
-            if (parts[0].equals("CLOSE#"))
-            {
-                pw.println("CLOSE#0");
-                disconnect(myID);
-
-                return false;
-            }
-            else
-            {
-                disconnect(myID);
-                pw.println("CLOSE#1");
-                return false;
-
             }
         }
         else if (parts.length == 3)
@@ -136,11 +116,7 @@ class ClientHandler implements Runnable
         try
         {
             String message;
-            String authenticate;
-            boolean keepRunning;
-
-            authenticate = scanner.nextLine();
-            keepRunning = authentication(authenticate, pw);
+            boolean keepRunning = true;
             while (keepRunning && scanner.hasNext())
             {
                 message = scanner.nextLine(); //Blocking call

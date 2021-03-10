@@ -18,19 +18,32 @@ public class ChatClient
         Thread t = new Thread(sr);
         t.start();
 
+
+
+
+
+
         Scanner keyboard = new Scanner(System.in);
         boolean keepRunning = true;
         while (keepRunning)
         {
             String msgToSend = keyboard.nextLine();
-            pw.println(msgToSend);
-
-            if (msgToSend.equals("CLOSE#"))
+            if (msgToSend.equals("CLOSE#") || sr.bSr == false)
             {
+                System.out.println("CLOSE#0");
                 keepRunning = false;
+            } else
+            {
+                pw.println(msgToSend);
             }
+
+
+
+
         }
+
         socket.close();
+
     }
 
     public static void main(String[] args) throws IOException
@@ -50,6 +63,9 @@ public class ChatClient
                 System.out.println("Invalid port or ip, using defaults port :");
             }
         }
-        new ChatClient().connect(ip, port);
+        ChatClient chatClient = new ChatClient();
+        chatClient.connect(ip, port);
+
+
     }
 }
