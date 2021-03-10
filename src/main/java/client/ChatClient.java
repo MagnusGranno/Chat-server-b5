@@ -39,7 +39,7 @@ public class ChatClient
     public static void main(String[] args) throws IOException
     {
         int DEFAULT_port = 8080;
-        String DEFAULT_SERVER_IP = "localhost";
+        String DEFAULT_SERVER_IP = "206.81.26.43";
         int port = DEFAULT_port;
         String ip = DEFAULT_SERVER_IP;
         if (args.length == 2)

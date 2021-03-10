@@ -88,10 +88,6 @@ class ClientHandler implements Runnable
                     {
                         chatServer.sendSpecific(this, argument, content);
                     }
-                    else if(!chatServer.users.contains(argument))
-                    {
-                        pw.println(argument + " doesn't exist or is not online");
-                    }
                     else if (argument.contains(","))
                     {
                         String[] receivers = argument.split(",");
@@ -101,6 +97,11 @@ class ClientHandler implements Runnable
                             chatServer.sendSpecific(this, receiver, content);
                         }
                     }
+                    else if(!chatServer.users.contains(argument))
+                    {
+                        pw.println(argument + " doesn't exist or is not online");
+                    }
+
                     break;
                 default:
                     disconnect(myID);
