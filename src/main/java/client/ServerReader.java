@@ -5,6 +5,7 @@ import server.ChatServer;
 import java.io.InputStream;
 import java.util.Scanner;
 
+//Jensen
 public class ServerReader implements Runnable
 {
     Scanner scanner;

@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+//Oliver
 class ClientHandler implements Runnable
 {
     private boolean keepRunning = false;
@@ -118,7 +119,7 @@ class ClientHandler implements Runnable
         chatServer.allClientHandlers.remove(clientHandler);
         chatServer.sendOnline();
     }
-
+//Magnus
     private void handleClient() throws IOException
     {
 

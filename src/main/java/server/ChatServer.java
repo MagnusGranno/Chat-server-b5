@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChatServer
 {
+
+    //Jensen
     public ArrayList<String> users = new ArrayList<>(4);
     private ServerSocket serverSocket;
     public ConcurrentHashMap<String, ClientHandler> allClientHandlers = new ConcurrentHashMap<>();
@@ -27,15 +29,12 @@ public class ChatServer
         }
     }
 
-
     public void sendToAll(String msg)
     {
-
         allClientHandlers.values().forEach((clientHandler ->
         {
             clientHandler.msgToAll(msg);
         }));
-
     }
 
     public void sendSpecific(ClientHandler sender, String receiver, String msg)
@@ -54,14 +53,12 @@ public class ChatServer
         addToSendQueue(online);
     }
 
-
-
     public void addToClientHandlers(String name, ClientHandler client)
     {
         allClientHandlers.put(name, client);
     }
 
-
+    //Hansen
     private void startServer(int port) throws IOException
     {
         users.add("Granno");

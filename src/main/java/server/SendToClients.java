@@ -2,6 +2,7 @@ package server;
 
 import java.util.concurrent.BlockingQueue;
 
+//Hansen
 class SendToClients implements Runnable
 {
     ChatServer chatServer;

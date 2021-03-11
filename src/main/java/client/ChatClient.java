@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+//Magnus
 public class ChatClient
 {
     Socket socket;
@@ -29,11 +30,8 @@ public class ChatClient
         {
             String msgToSend = keyboard.nextLine();
             pw.println(msgToSend);
-
         }
-
         socket.close();
-
     }
 
     public static void main(String[] args) throws IOException
